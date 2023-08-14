@@ -19,7 +19,9 @@ func Scan(urlString string, wordlist []string) {
 		log.Fatal(err)
 	}
 
-	var foundURLs []string
+	var foundURLs200 [][]string
+	var foundURLs302 [][]string
+	var foundURLs404 [][]string
 	var mu sync.Mutex
 
 	client := http.Client{
@@ -45,9 +47,21 @@ func Scan(urlString string, wordlist []string) {
 			}
 			defer resp.Body.Close()
 
+			statusText := ""
 			if resp.StatusCode == 200 {
+				statusText = "200_OK"
 				mu.Lock()
-				foundURLs = append(foundURLs, targetURL)
+				foundURLs200 = append(foundURLs200, []string{color.GreenString(targetURL), color.GreenString(statusText)})
+				mu.Unlock()
+			} else if resp.StatusCode == 302 {
+				statusText = "302_Found"
+				mu.Lock()
+				foundURLs302 = append(foundURLs302, []string{color.YellowString(targetURL), color.YellowString(statusText)})
+				mu.Unlock()
+			} else if resp.StatusCode == 404 {
+				statusText = "404_Not_Found"
+				mu.Lock()
+				foundURLs404 = append(foundURLs404, []string{color.RedString(targetURL), color.RedString(statusText)})
 				mu.Unlock()
 			}
 
@@ -62,14 +76,16 @@ func Scan(urlString string, wordlist []string) {
 
 	wg.Wait()
 
-	printResults(foundURLs)
+	printResults(foundURLs200)
+	printResults(foundURLs302)
+	printResults(foundURLs404)
 }
 
 func printProgress(percentCompleted int) {
 	fmt.Printf("\rProgress: %d%%", percentCompleted)
 }
 
-func printResults(urls []string) {
+func printResults(urls [][]string) {
 	if len(urls) == 0 {
 		color.Yellow("Bulunan URL yok.")
 		return
@@ -78,10 +94,10 @@ func printResults(urls []string) {
 	fmt.Println("\rProgress: 100%")
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Found_URLs"})
+	table.SetHeader([]string{"Found_URLs", "Status"})
 
-	for _, url := range urls {
-		table.Append([]string{color.RedString(url)})
+	for _, urlInfo := range urls {
+		table.Append(urlInfo)
 	}
 
 	table.Render()
