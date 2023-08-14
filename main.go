@@ -46,9 +46,9 @@ func main() {
 			}
 
 			scraper.Scrape(url)
-			if wordlistPath != "" {
-				dirscanner.Scan(url, wordlistContent)
-			}
+
+			dirscanner.Scan(url, wordlistContent)
+
 			if scanIP {
 				lookup.Scan(url)
 			}
