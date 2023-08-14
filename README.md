@@ -13,7 +13,7 @@ GoScaner is a command-line tool designed for various scanning tasks. It allows y
 
 To use GoScaner, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/yourusername/goscaner.git`
+1. Clone the repository: `git clone https://github.com/ender6867/goscaner.git`
 2. Navigate to the project directory: `cd goscaner`
 3. Build the binary: `go build`
 
