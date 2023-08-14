@@ -29,13 +29,22 @@ func main() {
 
 		Run: func(cmd *cobra.Command, args []string) {
 			var wordlistContent []string
-			if wordlistPath != "" {
+
+			if wordlistPath == "" {
+				defaultWordlistPath := "./wordlist/wordpress.fuzz.txt"
+				var err error
+				wordlistContent, err = readWordlist(defaultWordlistPath)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else {
 				var err error
 				wordlistContent, err = readWordlist(wordlistPath)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
+
 			scraper.Scrape(url)
 			if wordlistPath != "" {
 				dirscanner.Scan(url, wordlistContent)
