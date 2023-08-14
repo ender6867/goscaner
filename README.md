@@ -41,3 +41,7 @@ Here are some example usages to perform scanning and see the results:
 1. Perform a URL scan:
    ```sh
    ./goscaner -u https://www.example.com -w path/wordlist.txt
+2. Perform an IP scan:
+      ```sh
+   ./goscaner -s -u https://www.example.com -w path/wordlist.txt
+
