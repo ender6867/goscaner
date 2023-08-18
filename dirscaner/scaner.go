@@ -21,7 +21,7 @@ func Scan(urlString string, wordlist []string) {
 
 	var foundURLs200 [][]string
 	var foundURLs302 [][]string
-	var foundURLs404 [][]string
+	var foundURLsOther [][]string
 	var mu sync.Mutex
 
 	client := http.Client{
@@ -58,10 +58,11 @@ func Scan(urlString string, wordlist []string) {
 				mu.Lock()
 				foundURLs302 = append(foundURLs302, []string{color.YellowString(targetURL), color.YellowString(statusText)})
 				mu.Unlock()
-			} else if resp.StatusCode == 404 {
-				statusText = "404_Not_Found"
+
+			} else if resp.StatusCode < 400 || resp.StatusCode >= 500 {
+				statusText = fmt.Sprintf("%d", resp.StatusCode)
 				mu.Lock()
-				foundURLs404 = append(foundURLs404, []string{color.RedString(targetURL), color.RedString(statusText)})
+				foundURLsOther = append(foundURLsOther, []string{color.RedString(targetURL), color.RedString(statusText)})
 				mu.Unlock()
 			}
 
@@ -78,7 +79,7 @@ func Scan(urlString string, wordlist []string) {
 
 	printResults(foundURLs200)
 	printResults(foundURLs302)
-	printResults(foundURLs404)
+	printResults(foundURLsOther)
 }
 
 func printProgress(percentCompleted int) {
